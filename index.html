@@ -7,20 +7,33 @@
 <style>
 body { margin:0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background:#f7f5f0; color: #4a3f35; padding-bottom: 40px; }
 header { background: #faf7f2; padding: 25px 15px; text-align: center; border-bottom: 4px solid #d4a373; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-h1 { margin: 0; color: #bc6c25; font-size: 24px; }
+h1 { margin: 0; color: #bc6c25; font-size: 26px; }
 .subtitle { margin: 5px 0 0 0; font-size: 14px; color: #6b5e4f; font-style: italic; }
-.filter-container { text-align: center; padding: 15px; }
+
+/* Inhaltsverzeichnis */
+.toc-card { max-width: 600px; margin: 20px auto 10px auto; padding: 18px; background: #faf7f2; border: 1px solid #e6dfd3; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+.toc-title { font-size: 16px; font-weight: bold; color: #bc6c25; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.toc-item { background: #fff; border: 1px solid #e6dfd3; border-radius: 12px; padding: 10px; font-size: 13px; font-weight: 600; color: #4a3f35; cursor: pointer; text-align: center; transition: all 0.2s; }
+.toc-item:hover { background-color: #f1ede2; border-color: #dda15e; transform: translateY(-1px); }
+
+/* Filter Buttons */
+.filter-container { text-align: center; padding: 10px 15px 20px 15px; max-width: 650px; margin: 0 auto; }
 .filter-btn { background-color: #fff; color: #4a3f35; border: 1px solid #e6dfd3; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; margin: 3px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
 .filter-btn:hover, .filter-btn.active { background-color: #dda15e; color: white; border-color: #dda15e; box-shadow: 0 2px 5px rgba(221,161,94,0.3); }
+
+/* Rezept Karten */
 .recipes-container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
-.recipe-card { background: #fff; border-radius: 16px; border: 1px solid #e6dfd3; padding: 20px; margin-bottom: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.02); }
-h2 { margin-top: 0; color: #bc6c25; font-size: 18px; border-bottom: 1px dashed #e6dfd3; padding-bottom: 8px; }
+.recipe-card { background: #fff; border-radius: 16px; border: 1px solid #e6dfd3; padding: 20px; margin-bottom: 25px; box-shadow: 0 3px 10px rgba(0,0,0,0.02); }
+.recipe-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; background-color: #f1ede2; }
+h2 { margin-top: 0; color: #bc6c25; font-size: 19px; border-bottom: 1px dashed #e6dfd3; padding-bottom: 8px; }
 .tag { display: inline-block; background: #f1ede2; color: #606c38; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px; margin-bottom: 12px; }
 h3 { font-size: 14px; color: #4a3f35; margin-bottom: 8px; }
 ul { margin: 0 0 15px 0; padding-left: 20px; }
 li { margin-bottom: 6px; font-size: 14px; cursor: pointer; }
 li.checked { text-decoration: line-through; color: #b0a89f; }
 .steps { font-size: 14px; line-height: 1.5; color: #5c5043; padding-left: 15px; border-left: 3px solid #dda15e; }
+.empty-notice { text-align: center; color: #8c7e6f; padding: 40px 20px; font-style: italic; }
 </style>
 </head>
 <body>
@@ -30,64 +43,62 @@ li.checked { text-decoration: line-through; color: #b0a89f; }
     <div class="subtitle">Einfache & gemütliche Rezepte für unterwegs</div>
 </header>
 
-<div class="filter-container">
-    <button class="filter-btn active" onclick="filterRecipes('all', this)">📋 Alle Rezepte</button>
-    <button class="filter-btn" onclick="filterRecipes('onepot', this)">🍲 One-Pot</button>
-    <button class="filter-btn" onclick="filterRecipes('pfanne', this)">🍳 Pfanne</button>
-    <button class="filter-btn" onclick="filterRecipes('schnell', this)">⏱️ Schnelles</button>
+<!-- INHALTSVERZEICHNIS -->
+<div class="toc-card">
+    <div class="toc-title">📖 Inhaltsverzeichnis</div>
+    <div class="toc-grid">
+        <div class="toc-item" onclick="selectCategory('omnia')">♨️ Omnia</div>
+        <div class="toc-item" onclick="selectCategory('suppen')">🍲 Suppen</div>
+        <div class="toc-item" onclick="selectCategory('salate')">🥗 Salate</div>
+        <div class="toc-item" onclick="selectCategory('pfanne')">🍳 Pfanne</div>
+        <div class="toc-item" onclick="selectCategory('suesses')">🍰 Süßes</div>
+    </div>
 </div>
 
+<!-- FILTER BUTTONS -->
+<div class="filter-container">
+    <button class="filter-btn active" id="btn-all" onclick="filterRecipes('all', this)">📋 Alle Rezepte</button>
+    <button class="filter-btn" id="btn-omnia" onclick="filterRecipes('omnia', this)">♨️ Omnia</button>
+    <button class="filter-btn" id="btn-suppen" onclick="filterRecipes('suppen', this)">🍲 Suppen</button>
+    <button class="filter-btn" id="btn-salate" onclick="filterRecipes('salate', this)">🥗 Salate</button>
+    <button class="filter-btn" id="btn-pfanne" onclick="filterRecipes('pfanne', this)">🍳 Pfanne</button>
+    <button class="filter-btn" id="btn-suesses" onclick="filterRecipes('suesses', this)">🍰 Süßes</button>
+</div>
+
+<!-- REZEPTE LISTE -->
 <div class="recipes-container" id="recipesList">
 
-    <div class="recipe-card" data-category="onepot">
-        <h2>🍲 Camper-Cremetopf mit Kichererbsen</h2>
-        <span class="tag">One-Pot • Sättigend</span>
+    <!-- BEISPIEL OMNIA -->
+    <div class="recipe-card" data-category="omnia">
+        <h2>♨️ Überbackene Nachos aus dem Omnia</h2>
+        <span class="tag">Omnia • Schneller Snack</span>
         <h3>Zutaten (antippen zum Abhaken):</h3>
         <ul>
-            <li onclick="toggleItem(this)">1 Dose Kichererbsen (abgespült)</li>
-            <li onclick="toggleItem(this)">1 Dose gestückelte Tomaten</li>
-            <li onclick="toggleItem(this)">1 Packung Sahne (oder Hafercreme)</li>
-            <li onclick="toggleItem(this)">2 Hände voll Babyspinat</li>
-            <li onclick="toggleItem(this)">1 Zwiebel & Knoblauch</li>
-            <li onclick="toggleItem(this)">Salz, Pfeffer, Currypulver</li>
+            <li onclick="toggleItem(this)">1 Tüte Nachos / Tortillachips</li>
+            <li onclick="toggleItem(this)">1 Dose Salsa-Sauce</li>
+            <li onclick="toggleItem(this)">100g Geriebener Käse (Gouda oder Cheddar)</li>
+            <li onclick="toggleItem(this)">1 kleine Dose Mais oder schwarze Bohnen</li>
         </ul>
         <h3>Zubereitung:</h3>
         <div class="steps">
-            Zwiebel und Knoblauch im Topf mit etwas Öl andünsten. Currypulver kurz mitbraten. Tomaten und Kichererbsen dazugeben, 10 Minuten köcheln lassen. Sahne einrühren, Spinat unterheben, bis er zusammenfällt. Mit Salz und Pfeffer abschmecken. Dazu schmeckt Fladenbrot!
+            Die Hälfte der Nachos in die geschmierte Omnia-Form geben. Etwas Salsa, Mais und Käse darüber verteilen. Die restlichen Nachos und Zutaten als zweite Schicht obenauf geben. Auf mitteler Hitze ca. 10-15 Minuten überbacken, bis der Käse geschmolzen ist.
         </div>
     </div>
 
+    <!-- BEISPIEL PFANNE -->
     <div class="recipe-card" data-category="pfanne">
-        <h2>🍳 Deftige Pfanne "Schweden-Art"</h2>
-        <span class="tag">Pfannengericht • Herzhaft</span>
+        <h2>🍳 Cremiges Zucchini-Gnocchi-Pfännchen</h2>
+        <span class="tag">Pfanne • Veggie</span>
         <h3>Zutaten (antippen zum Abhaken):</h3>
         <ul>
-            <li onclick="toggleItem(this)">1 Packung Spätzle (aus dem Kühlregal)</li>
-            <li onclick="toggleItem(this)">150g Wiener Würstchen (in Scheiben)</li>
-            <li onclick="toggleItem(this)">1 kleine Dose Erbsen & Möhren</li>
-            <li onclick="toggleItem(this)">1 Schuss Schmand oder Crème fraîche</li>
-            <li onclick="toggleItem(this)">Etwas Butter zum Anbraten</li>
+            <li onclick="toggleItem(this)">1 Packung Gnocchi (Kühlregal)</li>
+            <li onclick="toggleItem(this)">1 kleine Zucchini (in Scheiben)</li>
+            <li onclick="toggleItem(this)">100g Frischkäse oder Kräuter-Crème-Fraîche</li>
+            <li onclick="toggleItem(this)">Etwas Olivenöl, Salz & Pfeffer</li>
         </ul>
         <h3>Zubereitung:</h3>
         <div class="steps">
-            Die Wurstscheiben in einer großen Pfanne mit etwas Butter goldbraun anknuspern. Die Spätzle dazugeben und mitbraten, bis sie leicht Farbe bekommen. Das Gemüse (ohne Wasser) dazugeben und heiß werden lassen. Am Schluss den Schmand unterrühren, kurz durchschwenken und servieren.
-        </div>
-    </div>
-
-    <div class="recipe-card" data-category="schnell">
-        <h2>⏱️ Schnelles Pfannen-Couscous</h2>
-        <span class="tag">Schnelles • Ohne langes Kochen</span>
-        <h3>Zutaten (antippen zum Abhaken):</h3>
-        <ul>
-            <li onclick="toggleItem(this)">1 Tasse Couscous</li>
-            <li onclick="toggleItem(this)">1 Tasse kochende Gemüsebrühe</li>
-            <li onclick="toggleItem(this)">1 Glas Hirtenkäse / Feta (in Würfeln)</li>
-            <li onclick="toggleItem(this)">1 kleine Gurke oder Kirschtomaten</li>
-            <li onclick="toggleItem(this)">Etwas Olivenöl oder Kräuterlinge</li>
-        </ul>
-        <h3>Zubereitung:</h3>
-        <div class="steps">
-            Den Couscous in eine Schüssel geben, mit der kochenden Brühe übergießen und abgedeckt 5 Minuten quellen lassen. In der Zwischenzeit Gurke/Tomaten klein schneiden. Das Gemüse und den gewürfelten Käse unter den fertigen Couscous heben. Mit einem Schuss Olivenöl und Kräutern verfeinern. Fertig!
+            Gnocchi in etwas Olivenöl goldbraun anbraten und aus der Pfanne nehmen. Zucchini-Scheiben in derselben Pfanne anbraten. Frischkäse und einen Schuss Wasser dazugeben, um eine cremige Sauce zu rühren. Gnocchi unterheben und kurz erwärmen.
         </div>
     </div>
 
@@ -99,12 +110,12 @@ function toggleItem(element) {
 }
 
 function filterRecipes(category, button) {
-    // Buttons umschalten
+    // Buttons aktualisieren
     const buttons = document.querySelectorAll('.filter-btn');
     buttons.forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
-    
-    // Rezepte filtern
+    if (button) button.classList.add('active');
+
+    // Karten filtern
     const cards = document.querySelectorAll('.recipe-card');
     cards.forEach(card => {
         if (category === 'all' || card.getAttribute('data-category') === category) {
@@ -114,6 +125,15 @@ function filterRecipes(category, button) {
         }
     });
 }
+
+function selectCategory(category) {
+    const targetBtn = document.getElementById('btn-' + category);
+    filterRecipes(category, targetBtn);
+    
+    // Sanft zu den Rezepten scrollen
+    document.getElementById('recipesList').scrollIntoView({ behavior: 'smooth' });
+}
 </script>
+
 </body>
 </html>
